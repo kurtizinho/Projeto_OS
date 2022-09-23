@@ -4,6 +4,7 @@ Python Version >= 3.7.3
 Modeules Used = os, cx_Oracle
 
 Funções Básicas:
+
 1 - Consultar Ordens de Serviço OK
 2 - Inserir contas a receber das ordens de serviço 
 3 - Colocar as ordens de serviço em execução
