@@ -1,3 +1,5 @@
+#/bin/python3
+
 '''Script de Atualizações de Ordem de Serviço!
 
 Python Version >= 3.7.3
@@ -10,13 +12,11 @@ Funções Básicas:
 3 - Colocar as ordens de serviço em execução após pagamento. STATUS =
 4 - Caso a ordem de serviço seja cancelada ou reaberta, excluir o contas a receber. 
 STATUS = quanto tempo até a exclusão?
-
-5 - criar tabela de log STATUS =
+5 - criar tabela de log STATUS = __?
 
 '''
 import os
 from time import sleep
-import tqdm
 
 try:
     import cx_Oracle as cxo
@@ -124,14 +124,10 @@ while 1 == 1:
             
         modify_situation(numos)       
         
-        
-        
             #DEBUG
             #print(codcli, prest, duplic, valor, dtvenc, codcob, dtemissao, codfilial,
             #            status, codusur, dtvencorig, numtransvenda, dtsaida, codsupervisor, numos)
         
-
-
     #con_orcl.close()
     print('Aguardando 15 segundos para iniciar novamente.')
     sleep(15)
