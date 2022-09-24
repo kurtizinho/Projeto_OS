@@ -1,0 +1,13 @@
+[Unit]
+Description=OS_Update - Serviço de modificação OS - Winthor
+After=network.target
+StartLimitIntervalSec=0
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=root
+ExecStart=/opt/PROJETO_OS/software/main.py
+ 
+[Install]
+WantedBy=multi-user.target
