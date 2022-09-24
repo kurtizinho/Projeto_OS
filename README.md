@@ -10,5 +10,5 @@ As funções bàsicas são:
 
 # Projeto Beta
 
-contato: eunixsoluções@gmail.com
-tel: 85 981361606
+* contato: eunixsoluções@gmail.com
+* tel: 85 981361606
