@@ -1,19 +1,22 @@
 '''Script de Atualizações de Ordem de Serviço!
 
 Python Version >= 3.7.3
-Modeules Used = os, cx_Oracle
+Modeules Used = os, cx_Oracle, time
 
 Funções Básicas:
 
 1 - Consultar OS's com Situaão 1 (Abertas) STATUS = OK 
 2 - Inserir contas a receber de OS abertas. STATUS = OK 
 3 - Colocar as ordens de serviço em execução após pagamento. STATUS =
-4 - Caso a ordem de serviço seja cancelada ou reaberta, excluir o contas a receber. STATUS =
+4 - Caso a ordem de serviço seja cancelada ou reaberta, excluir o contas a receber. 
+STATUS = quanto tempo até a exclusão?
+
 5 - criar tabela de log STATUS =
 
 '''
 import os
-import time
+from time import sleep
+import tqdm
 
 try:
     import cx_Oracle as cxo
@@ -76,53 +79,60 @@ def modify_situation(numos):
                     AND DTPAG IS NOT NULL"""
     sqlr6 = cursor.execute(sql6).fetchone()
     if sqlr6[0] > 0:
-        cursor.execute(f"UPDATE PCORDEMSERVICO SET SITUACAO = 1 WHERE NUMOS = {numos}")
+        cursor.execute(f"UPDATE PCORDEMSERVICO SET SITUACAO = 2 WHERE NUMOS = {numos}")
+        #print(f"OS {numos} foi colocada em execução") #DEBUG
 
 # Start Program
     # --Consulting open OS
 
-sql1 =  """ SELECT  O.CODCLI, 
-                    '1' PREST, 
-                    (SELECT PROXNUMTRANSVENDA FROM PCCONSUM) DUPLIC, 
-                    (SELECT SUM(PUNIT) FROM PCORDEMSERVICOI WHERE NUMOS = O.NUMOS) VALOR, 
-                    TO_CHAR(SYSDATE, 'DD/MM/YYYY') DTVENC, 
-                    'ORDS' CODCOB, 
-                    TO_CHAR(SYSDATE, 'DD/MM/YYYY') DTEMISSAO, 
-                    O.CODFILIAL,
-                    'A' STATUS, 
-                    O.CODRCA, 
-                    TO_CHAR(SYSDATE, 'DD/MM/YYYY') DTVENCORIG, 
-                    (SELECT PROXNUMTRANSVENDA FROM PCCONSUM) NUMTRANSVENDA, 
-                    TO_CHAR(SYSDATE, 'DD/MM/YYYY') DTSAIDA, 
-                    (SELECT CODSUPERVISOR FROM PCUSUARI WHERE CODUSUR = O.CODRCA) CODSUPERVISOR, 
-                    O.NUMOS
-            FROM PCORDEMSERVICO O
-            WHERE O.SITUACAO = 1
-            AND (SELECT SUM(PUNIT) 
-		            FROM PCORDEMSERVICOI 
-		            WHERE NUMOS = O.NUMOS) > 0
-        """
-result = cursor.execute(sql1).fetchall()
+while 1 == 1:
 
-for os in result:
-    codcli, prest, duplic, valor = os[0], os[1], os[2], os[3]
-    dtvenc, codcob, dtemissao, codfilial = os[4], os[5], os[6], os[7]   
-    status, codusur, dtvencorig = os[8], os[9], os[10],
-    dtsaida, codsupervisor, numos = os[11], os[12], os[13]
+    sql1 =  """ SELECT  O.CODCLI, 
+                        '1' PREST, 
+                        (SELECT PROXNUMTRANSVENDA FROM PCCONSUM) DUPLIC, 
+                        (SELECT SUM(PUNIT) FROM PCORDEMSERVICOI WHERE NUMOS = O.NUMOS) VALOR, 
+                        TO_CHAR(SYSDATE, 'DD/MM/YYYY') DTVENC, 
+                        'ORDS' CODCOB, 
+                        TO_CHAR(SYSDATE, 'DD/MM/YYYY') DTEMISSAO, 
+                        O.CODFILIAL,
+                        'A' STATUS, 
+                        O.CODRCA, 
+                        TO_CHAR(SYSDATE, 'DD/MM/YYYY') DTVENCORIG, 
+                        (SELECT PROXNUMTRANSVENDA FROM PCCONSUM) NUMTRANSVENDA, 
+                        TO_CHAR(SYSDATE, 'DD/MM/YYYY') DTSAIDA, 
+                        (SELECT CODSUPERVISOR FROM PCUSUARI WHERE CODUSUR = O.CODRCA) CODSUPERVISOR, 
+                        O.NUMOS
+                FROM PCORDEMSERVICO O
+                WHERE O.SITUACAO = 1
+                AND (SELECT SUM(PUNIT) 
+                        FROM PCORDEMSERVICOI 
+                        WHERE NUMOS = O.NUMOS) > 0
+            """
+    result = cursor.execute(sql1).fetchall()
+
+    for os in result:
+        codcli, prest, duplic, valor = os[0], os[1], os[2], os[3]
+        dtvenc, codcob, dtemissao, codfilial = os[4], os[5], os[6], os[7]   
+        status, codusur, dtvencorig = os[8], os[9], os[10],
+        dtsaida, codsupervisor, numos = os[12], os[13], os[14]
+            
+        value = verify_pcprest(numos)
+        if value == 0:
+            numtransvenda = stores_transvenda()
+            insert_pcprest(codcli, prest, duplic, valor, dtvenc, codcob, dtemissao, 
+            codfilial, status, codusur, dtvencorig, numtransvenda, dtsaida, codsupervisor, numos) 
+            
+        modify_situation(numos)       
         
-    value = verify_pcprest(numos)
-    if value == 0:
-        numtransvenda = stores_transvenda()
-        insert_pcprest(codcli, prest, duplic, valor, dtvenc, codcob, dtemissao, 
-        codfilial, status, codusur, dtvencorig, numtransvenda, dtsaida, codsupervisor, numos)        
         
-        #DEBUG
-        #print(codcli, prest, duplic, valor, dtvenc, codcob, dtemissao, codfilial,
-        #            status, codusur, dtvencorig, numtransvenda, dtsaida, codsupervisor, numos)
-    else:
-        del_pcprest(numos)
+        
+            #DEBUG
+            #print(codcli, prest, duplic, valor, dtvenc, codcob, dtemissao, codfilial,
+            #            status, codusur, dtvencorig, numtransvenda, dtsaida, codsupervisor, numos)
+        
 
 
-con_orcl.close()
-
+    #con_orcl.close()
+    print('Aguardando 15 segundos para iniciar novamente.')
+    sleep(15)
 
