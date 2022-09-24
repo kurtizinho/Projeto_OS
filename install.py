@@ -2,4 +2,4 @@
 
 import os
 
-os.system('/opt/eunix/sw/OS_Project')
+os.system('/opt/eunix/Projeto_OS/')
