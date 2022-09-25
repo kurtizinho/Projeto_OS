@@ -121,7 +121,6 @@ while 1 == 1:
                 AND (SELECT COUNT(*) FROM PCPREST WHERE NUMOS = O.NUMOS) <> 0
             """
     sqlr7 = cursor.execute(sql7).fetchall()
-    print(sqlr7)
 
     for os in result:
         codcli, prest, duplic, valor = os[0], os[1], os[2], os[3]
@@ -146,7 +145,7 @@ while 1 == 1:
         os = _os[0]
         os_del = verify_pcprest(os)
         if os_del >0:
-            pdel_pcprest(os)
+            del_pcprest(os)
         
     
 
