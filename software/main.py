@@ -22,6 +22,7 @@ try:
     import cx_Oracle as cxo
 except:
     os.system('pip3 install cx_Oracle')
+    import cx_Oracle as cxo
 
 with open('/opt/Projeto_OS/software/ora.conf', 'r') as data:
     read = data.read().split('\n')
