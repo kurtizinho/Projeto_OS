@@ -3,16 +3,7 @@
 '''Script de Atualizações de Ordem de Serviço!
 
 Python Version >= 3.7.3
-Modeules Used = os, cx_Oracle, time
-
-Funções Básicas:
-
-1 - Consultar OS's com Situação 1 (Abertas) STATUS = OK 
-2 - Inserir contas a receber de OS abertas. STATUS = OK 
-3 - Colocar as ordens de serviço em execução após pagamento. STATUS = OK
-4 - Caso a ordem de serviço seja cancelada excluir contas a receber. STATUS = OK
-5 - Atualizar o contas a receber quando modificado valor das OS's. STATUS = OK 
-6 - criar tabela de log STATUS = __?
+Modules Used = os, cx_Oracle, time
 
 '''
 import os
@@ -90,8 +81,11 @@ def update_pcprest(numos, valor):
 
 # Start Program
     # --Consulting open OS
+        # Looping iniciado com a função sleep com 15 segundos ao final do Looping
 
 while 0 == 0:
+    
+    # Primeira consulta para buscar os dados para inserção na PCPREST.
 
     sql1 =  """ SELECT  O.CODCLI, 
                         '1' PREST, 
@@ -116,6 +110,8 @@ while 0 == 0:
             """
     result = cursor.execute(sql1).fetchall()
 
+    # Segunda consulta para buscar OS cancelada.
+
     sql7 = """ SELECT O.NUMOS
                 FROM PCORDEMSERVICO O
                 WHERE O.SITUACAO = 3
@@ -126,11 +122,12 @@ while 0 == 0:
             """
     sqlr7 = cursor.execute(sql7).fetchall()
 
+    # Terceira consulta para buscar OS com valor diferente da PCPREST
+
     sql8 =  """SELECT P.NUMOS, 
-                     (SELECT SUM(PUNIT) FROM PCORDEMSERVICOI WHERE NUMOS = P.NUMOS) VALOR
+                     (SELECT SUM(I.QTDE*I.PUNIT) FROM PCORDEMSERVICOI WHERE NUMOS = P.NUMOS) VALOR
                      FROM PCPREST P
-                        WHERE NUMOS = 845
-                        AND P.VALOR <> (SELECT SUM(I.QTDE*I.PUNIT) 
+                        WHERE P.VALOR <> (SELECT SUM(I.QTDE*I.PUNIT) 
                                             FROM PCORDEMSERVICO O, 
                                                 PCORDEMSERVICOI I 
                                             WHERE I.NUMOS = P.NUMOS
@@ -138,31 +135,40 @@ while 0 == 0:
             """    
     sqlr8 = cursor.execute(sql8).fetchall()
     
+    # Laço for para desempacotar as variáveis
+
     for os in result:
         codcli, prest, duplic, valor = os[0], os[1], os[2], os[3]
         dtvenc, codcob, dtemissao, codfilial = os[4], os[5], os[6], os[7]   
         status, codusur, dtvencorig = os[8], os[9], os[10],
         dtsaida, codsupervisor, numos = os[12], os[13], os[14]
-            
+
+        #Verificando se o titulo já existe:    
+        
         value = verify_pcprest(numos)
+        
+        #Caso o titulo exista irá executar a inserção: 
+        
         if value == 0:
+            #Função para armazenar o NUMTRANSVENDA da PCCONSUM e somar +1
             numtransvenda = stores_transvenda()
+            
+            #Inserindo titulo
+
             insert_pcprest(codcli, prest, duplic, valor, dtvenc, codcob, dtemissao, 
             codfilial, status, codusur, dtvencorig, numtransvenda, dtsaida, codsupervisor, numos) 
-            
+
+        #Modificando a situação dos titulos pagos     
         modify_situation(numos)       
         
-            #DEBUG
-            #print(codcli, prest, duplic, valor, dtvenc, codcob, dtemissao, codfilial,
-            #            status, codusur, dtvencorig, numtransvenda, dtsaida, codsupervisor, numos)
-
-    
+    #Deletando titulos onde a Situação da OS esteja como cancelada        
     for _os in sqlr7:
         os = _os[0]
         os_del = verify_pcprest(os)
         if os_del >0:
             del_pcprest(os)
-        
+
+    #Atualizando valores dos titulos que estejam diferente entre PCPREST e PCORDEMSERVICOI    
     for _os in sqlr8:
         os = _os[0]
         valor = _os[1]
