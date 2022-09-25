@@ -7,7 +7,7 @@ Modeules Used = os, cx_Oracle, time
 
 Funções Básicas:
 
-1 - Consultar OS's com Situaão 1 (Abertas) STATUS = OK 
+1 - Consultar OS's com Situação 1 (Abertas) STATUS = OK 
 2 - Inserir contas a receber de OS abertas. STATUS = OK 
 3 - Colocar as ordens de serviço em execução após pagamento. STATUS =
 4 - Caso a ordem de serviço seja cancelada ou reaberta, excluir o contas a receber. 
@@ -71,7 +71,8 @@ def stores_transvenda():
     return numtrans
 
 def del_pcprest(numos):
-    sql5 = f"delete from pcprest where nums = {numos}"
+    sql5 = f"delete from pcprest where numos = {numos}"
+    sqlr5 = cursor.execute(sql5)
 
 def modify_situation(numos):
     sql6 = f"""SELECT COUNT(*) 
@@ -111,6 +112,17 @@ while 1 == 1:
             """
     result = cursor.execute(sql1).fetchall()
 
+    sql7 = """ SELECT O.NUMOS
+                FROM PCORDEMSERVICO O
+                WHERE O.SITUACAO = 3
+                AND (SELECT SUM(PUNIT) 
+                        FROM PCORDEMSERVICOI 
+                        WHERE NUMOS = O.NUMOS) > 0
+                AND (SELECT COUNT(*) FROM PCPREST WHERE NUMOS = O.NUMOS) <> 0
+            """
+    sqlr7 = cursor.execute(sql7).fetchall()
+    print(sqlr7)
+
     for os in result:
         codcli, prest, duplic, valor = os[0], os[1], os[2], os[3]
         dtvenc, codcob, dtemissao, codfilial = os[4], os[5], os[6], os[7]   
@@ -128,7 +140,16 @@ while 1 == 1:
             #DEBUG
             #print(codcli, prest, duplic, valor, dtvenc, codcob, dtemissao, codfilial,
             #            status, codusur, dtvencorig, numtransvenda, dtsaida, codsupervisor, numos)
+
+    
+    for _os in sqlr7:
+        os = _os[0]
+        os_del = verify_pcprest(os)
+        if os_del >0:
+            pdel_pcprest(os)
         
+    
+
     #con_orcl.close()
     #print('Aguardando 15 segundos para iniciar novamente.')
     sleep(15)
