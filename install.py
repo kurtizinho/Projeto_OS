@@ -19,9 +19,9 @@ def exec(_command):
     os.system(_command)
 
 
-commands = ['install unzip',
+commands = ['apt install unzip',
             '/opt/Projeto_OS/ora_install.py',
-            'cp /opt/Projeto_OS/eunix_os.service /etc/systemd/system/'
+            'cp /opt/Projeto_OS/eunix_os.service /etc/systemd/system/',
             'chmod -R 770 /opt/Projeto_OS',
             'systemctl enbale eunix_os && systemctl start eunix_os']
 
