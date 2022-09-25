@@ -85,7 +85,7 @@ def modify_situation(numos):
         #print(f"OS {numos} foi colocada em execução") #DEBUG
 
 def update_pcprest(numos, valor):
-    sql8 = f"UPDATE PCPREST SET VALOR = {valor} where numos = {valor}"
+    sql8 = f"UPDATE PCPREST SET VALOR = {valor} where numos = {numos}"
     sqlr8 = cursor.execute(sql8).fetchall()
 
 # Start Program
@@ -164,7 +164,7 @@ while 0 == 0:
         
     for _os in sqlr8:
         os = _os[0]
-        valor = os[1]
+        valor = _os[1]
         update_pcprest(os, valor)    
 
     #con_orcl.close()
