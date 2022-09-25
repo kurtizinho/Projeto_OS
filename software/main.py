@@ -130,6 +130,6 @@ while 1 == 1:
             #            status, codusur, dtvencorig, numtransvenda, dtsaida, codsupervisor, numos)
         
     #con_orcl.close()
-    print('Aguardando 15 segundos para iniciar novamente.')
+    #print('Aguardando 15 segundos para iniciar novamente.')
     sleep(15)
 

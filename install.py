@@ -23,7 +23,7 @@ commands = ['apt install unzip',
             '/opt/Projeto_OS/ora_install.py',
             'cp /opt/Projeto_OS/eunix_os.service /etc/systemd/system/',
             'chmod -R 770 /opt/Projeto_OS',
-            'systemctl enable eunix_os']
+            'systemctl enable eunix_os && systemctl start eunix_os']
 
 for x in commands:
     exec(x)
