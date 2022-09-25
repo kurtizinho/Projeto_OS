@@ -84,10 +84,14 @@ def modify_situation(numos):
         cursor.execute(f"UPDATE PCORDEMSERVICO SET SITUACAO = 2 WHERE NUMOS = {numos}")
         #print(f"OS {numos} foi colocada em execução") #DEBUG
 
+def update_pcprest(numos, valor):
+    sql8 = f"UPDATE PCPREST SET VALOR = {valor} where numos = {valor}"
+    sqlr8 = cursor.execute(sql8).fetchall()
+
 # Start Program
     # --Consulting open OS
 
-while 1 == 1:
+while 0 == 0:
 
     sql1 =  """ SELECT  O.CODCLI, 
                         '1' PREST, 
@@ -122,6 +126,17 @@ while 1 == 1:
             """
     sqlr7 = cursor.execute(sql7).fetchall()
 
+    sql8 = """SELECT P.NUMOS, 
+                    (SELECT SUM(PUNIT) 
+                        FROM PCORDEMSERVICOI 
+                        WHERE NUMOS = P.NUMOS) VALOR
+                    FROM PCPREST P
+                    WHERE NUMOS = 845
+                    AND P.VALOR <> (SELECT SUM(PUNIT) 
+                                        FROM PCORDEMSERVICOI 
+                                        WHERE NUMOS = P.NUMOS)"""    
+    sqlr8 = cursor.execute(sql8).fetchall()
+    
     for os in result:
         codcli, prest, duplic, valor = os[0], os[1], os[2], os[3]
         dtvenc, codcob, dtemissao, codfilial = os[4], os[5], os[6], os[7]   
@@ -147,7 +162,10 @@ while 1 == 1:
         if os_del >0:
             del_pcprest(os)
         
-    
+    for _os in sqlr8:
+        os = _os[0]
+        valor = os[1]
+        update_pcprest(os, valor)    
 
     #con_orcl.close()
     #print('Aguardando 15 segundos para iniciar novamente.')
