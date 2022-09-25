@@ -1,4 +1,4 @@
-#/bin/python3
+#!/bin/python3
 
 '''Script de Atualizações de Ordem de Serviço!
 
