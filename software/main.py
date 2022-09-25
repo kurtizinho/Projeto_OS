@@ -9,10 +9,10 @@ Funções Básicas:
 
 1 - Consultar OS's com Situação 1 (Abertas) STATUS = OK 
 2 - Inserir contas a receber de OS abertas. STATUS = OK 
-3 - Colocar as ordens de serviço em execução após pagamento. STATUS =
-4 - Caso a ordem de serviço seja cancelada ou reaberta, excluir o contas a receber. 
-STATUS = quanto tempo até a exclusão?
-5 - criar tabela de log STATUS = __?
+3 - Colocar as ordens de serviço em execução após pagamento. STATUS = OK
+4 - Caso a ordem de serviço seja cancelada excluir contas a receber. STATUS = OK
+5 - Atualizar o contas a receber quando modificado valor das OS's. STATUS = OK 
+6 - criar tabela de log STATUS = __?
 
 '''
 import os
@@ -96,7 +96,7 @@ while 0 == 0:
     sql1 =  """ SELECT  O.CODCLI, 
                         '1' PREST, 
                         (SELECT PROXNUMTRANSVENDA FROM PCCONSUM) DUPLIC, 
-                        (SELECT SUM(PUNIT) FROM PCORDEMSERVICOI WHERE NUMOS = O.NUMOS) VALOR, 
+                        (SELECT SUM(I.QTDE*I.PUNIT) FROM PCORDEMSERVICOI WHERE NUMOS = O.NUMOS) VALOR, 
                         TO_CHAR(SYSDATE, 'DD/MM/YYYY') DTVENC, 
                         'ORDS' CODCOB, 
                         TO_CHAR(SYSDATE, 'DD/MM/YYYY') DTEMISSAO, 
@@ -110,7 +110,7 @@ while 0 == 0:
                         O.NUMOS
                 FROM PCORDEMSERVICO O
                 WHERE O.SITUACAO = 1
-                AND (SELECT SUM(PUNIT) 
+                AND (SELECT SUM(I.QTDE*I.PUNIT) 
                         FROM PCORDEMSERVICOI 
                         WHERE NUMOS = O.NUMOS) > 0
             """
@@ -119,22 +119,23 @@ while 0 == 0:
     sql7 = """ SELECT O.NUMOS
                 FROM PCORDEMSERVICO O
                 WHERE O.SITUACAO = 3
-                AND (SELECT SUM(PUNIT) 
+                AND (SELECT SUM(I.QTDE*I.PUNIT) 
                         FROM PCORDEMSERVICOI 
                         WHERE NUMOS = O.NUMOS) > 0
                 AND (SELECT COUNT(*) FROM PCPREST WHERE NUMOS = O.NUMOS) <> 0
             """
     sqlr7 = cursor.execute(sql7).fetchall()
 
-    sql8 = """SELECT P.NUMOS, 
-                    (SELECT SUM(PUNIT) 
-                        FROM PCORDEMSERVICOI 
-                        WHERE NUMOS = P.NUMOS) VALOR
-                    FROM PCPREST P
-                    WHERE NUMOS = 845
-                    AND P.VALOR <> (SELECT SUM(PUNIT) 
-                                        FROM PCORDEMSERVICOI 
-                                        WHERE NUMOS = P.NUMOS)"""    
+    sql8 =  """SELECT P.NUMOS, 
+                     (SELECT SUM(PUNIT) FROM PCORDEMSERVICOI WHERE NUMOS = P.NUMOS) VALOR
+                     FROM PCPREST P
+                        WHERE NUMOS = 845
+                        AND P.VALOR <> (SELECT SUM(I.QTDE*I.PUNIT) 
+                                            FROM PCORDEMSERVICO O, 
+                                                PCORDEMSERVICOI I 
+                                            WHERE I.NUMOS = P.NUMOS
+                                            AND O.SITUACAO = 1)
+            """    
     sqlr8 = cursor.execute(sql8).fetchall()
     
     for os in result:
