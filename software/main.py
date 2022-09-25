@@ -23,7 +23,7 @@ try:
 except:
     os.system('pip3 install cx_Oracle')
 
-with open('ora.conf', 'r') as data:
+with open('/opt/Projeto_OS/software/ora.conf', 'r') as data:
     read = data.read().split('\n')
     list_data = []
     for x in read:
