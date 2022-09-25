@@ -13,7 +13,7 @@ _string = input('String de conexão: ')
 _user = getpass('User: ')
 _pass = getpass('Pass: ')
 
-with open('ora.conf', 'w+') as file:
+with open('/opt/Projeto_OS/software/ora.conf', 'w+') as file:
     file.write(f"""host={_host}
 string={_string}
 user={_user}
