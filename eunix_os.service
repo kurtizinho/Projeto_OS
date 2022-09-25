@@ -7,7 +7,7 @@ Type=simple
 Restart=always
 RestartSec=1
 User=root
-ExecStart=/opt/PROJETO_OS/software/main.py
+ExecStart=/opt/Projeto_OS/software/main.py
  
 [Install]
 WantedBy=multi-user.target
