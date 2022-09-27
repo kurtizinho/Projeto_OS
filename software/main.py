@@ -148,7 +148,7 @@ while 0 == 0:
         
         value = verify_pcprest(numos)
         
-        #Caso o titulo exista irá executar a inserção: 
+        #Caso o titulo não exista irá executar a inserção: 
         
         if value == 0:
             #Função para armazenar o NUMTRANSVENDA da PCCONSUM e somar +1

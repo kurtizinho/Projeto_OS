@@ -2,11 +2,6 @@
 
 import os
 from getpass import getpass
-try:
-    from tqdm import tqdm
-except:
-    os.system('pip3 install tqdm')
-    from tqdm import tqdm
 
 _host = input('Endereço do Banco: ')
 _string = input('String de conexão: ')
@@ -30,5 +25,5 @@ commands = ['apt install unzip',
             'chmod -R 770 /opt/Projeto_OS',
             'systemctl enable eunix_os && systemctl start eunix_os']
 
-for x in tqdm(commands):
+for x in commands:
     exec(x)
