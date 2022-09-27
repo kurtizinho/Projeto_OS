@@ -90,7 +90,7 @@ while 0 == 0:
     sql1 =  """ SELECT  O.CODCLI, 
                         '1' PREST, 
                         (SELECT PROXNUMTRANSVENDA FROM PCCONSUM) DUPLIC, 
-                        (SELECT SUM(I.QTDE*I.PUNIT) FROM PCORDEMSERVICOI WHERE NUMOS = O.NUMOS) VALOR, 
+                        (SELECT SUM(QTDE*PUNIT) FROM PCORDEMSERVICOI WHERE NUMOS = O.NUMOS) VALOR, 
                         TO_CHAR(SYSDATE, 'DD/MM/YYYY') DTVENC, 
                         'ORDS' CODCOB, 
                         TO_CHAR(SYSDATE, 'DD/MM/YYYY') DTEMISSAO, 
@@ -115,7 +115,7 @@ while 0 == 0:
     sql7 = """ SELECT O.NUMOS
                 FROM PCORDEMSERVICO O
                 WHERE O.SITUACAO = 3
-                AND (SELECT SUM(I.QTDE*I.PUNIT) 
+                AND (SELECT SUM(QTDE*PUNIT) 
                         FROM PCORDEMSERVICOI 
                         WHERE NUMOS = O.NUMOS) > 0
                 AND (SELECT COUNT(*) FROM PCPREST WHERE NUMOS = O.NUMOS) <> 0
@@ -125,7 +125,7 @@ while 0 == 0:
     # Terceira consulta para buscar OS com valor diferente da PCPREST
 
     sql8 =  """SELECT P.NUMOS, 
-                     (SELECT SUM(I.QTDE*I.PUNIT) FROM PCORDEMSERVICOI WHERE NUMOS = P.NUMOS) VALOR
+                     (SELECT SUM(QTDE*PUNIT) FROM PCORDEMSERVICOI WHERE NUMOS = P.NUMOS) VALOR
                      FROM PCPREST P
                         WHERE P.VALOR <> (SELECT SUM(I.QTDE*I.PUNIT) 
                                             FROM PCORDEMSERVICO O, 
