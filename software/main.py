@@ -40,14 +40,14 @@ def verify_pcprest(numos):
     return sqlr2[0]
     
 def insert_pcprest(codcli, prest, duplic, valor, dtvenc, codcob, dtemissao, codfilial,
-                    status, codusur, dtvencorig, numtransvenda, dtsaida, codsupervisor, numos):
+                    status, codusur, dtvencorig, numtransvenda, dtsaida, codsupervisor, numos, dtfecha):
     sql3 = f"""
     INSERT INTO PCPREST (CODCLI, PREST, DUPLIC, VALOR, DTVENC, CODCOB, DTEMISSAO, CODFILIAL,
 	                STATUS, CODUSUR, DTVENCORIG, NUMTRANSVENDA, DTSAIDA, CODSUPERVISOR, NUMOS)
     VALUES ({codcli}, {prest}, {duplic}, {valor}, to_date('{dtvenc}', 'DD/MM/YYYY'), '{codcob}', 
             to_date('{dtemissao}', 'DD/MM/YYYY'), {codfilial}, '{status}', {codusur}, 
             to_date('{dtvencorig}', 'DD/MM/YYYY'), {numtransvenda}, to_date('{dtsaida}', 'DD/MM/YYYY'), 
-            {codsupervisor}, {numos})
+            {codsupervisor}, {numos}, to_date('{dtfecha}', 'DD/MM/YYYY'))
     """
     print(sql3)
     sqlr3 = cursor.execute(sql3)
@@ -101,7 +101,8 @@ while 0 == 0:
                         (SELECT PROXNUMTRANSVENDA FROM PCCONSUM) NUMTRANSVENDA, 
                         TO_CHAR(SYSDATE, 'DD/MM/YYYY') DTSAIDA, 
                         (SELECT CODSUPERVISOR FROM PCUSUARI WHERE CODUSUR = O.CODRCA) CODSUPERVISOR, 
-                        O.NUMOS
+                        O.NUMOS,
+                        TO_CHAR(SYSDATE, 'DD/MM/YYYY') DTFECHA
                 FROM PCORDEMSERVICO O
                 WHERE O.SITUACAO = 1
                 AND (SELECT SUM(QTDE*PUNIT) 
@@ -141,7 +142,7 @@ while 0 == 0:
         codcli, prest, duplic, valor = os[0], os[1], os[2], os[3]
         dtvenc, codcob, dtemissao, codfilial = os[4], os[5], os[6], os[7]   
         status, codusur, dtvencorig = os[8], os[9], os[10],
-        dtsaida, codsupervisor, numos = os[12], os[13], os[14]
+        dtsaida, codsupervisor, numos, dtfecha = os[12], os[13], os[14], os[15]
 
         #Verificando se o titulo já existe:    
         
@@ -156,7 +157,7 @@ while 0 == 0:
             #Inserindo titulo
 
             insert_pcprest(codcli, prest, duplic, valor, dtvenc, codcob, dtemissao, 
-            codfilial, status, codusur, dtvencorig, numtransvenda, dtsaida, codsupervisor, numos) 
+            codfilial, status, codusur, dtvencorig, numtransvenda, dtsaida, codsupervisor, numos, dtfecha) 
 
         #Modificando a situação dos titulos pagos     
         modify_situation(numos)       
