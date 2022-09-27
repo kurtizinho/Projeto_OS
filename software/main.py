@@ -104,7 +104,7 @@ while 0 == 0:
                         O.NUMOS
                 FROM PCORDEMSERVICO O
                 WHERE O.SITUACAO = 1
-                AND (SELECT SUM(I.QTDE*I.PUNIT) 
+                AND (SELECT SUM(QTDE*PUNIT) 
                         FROM PCORDEMSERVICOI 
                         WHERE NUMOS = O.NUMOS) > 0
             """
