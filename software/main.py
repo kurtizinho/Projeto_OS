@@ -15,7 +15,7 @@ except:
     os.system('pip3 install cx_Oracle')
     import cx_Oracle as cxo
 
-with open('/opt/Projeto_OS/software/ora.conf', 'r') as data:
+with open('/mnt/HD2/Python/Projeto_OS/software/ora.conf', 'r') as data:
     read = data.read().split('\n')
     list_data = []
     for x in read:
@@ -43,7 +43,7 @@ def insert_pcprest(codcli, prest, duplic, valor, dtvenc, codcob, dtemissao, codf
                     status, codusur, dtvencorig, numtransvenda, dtsaida, codsupervisor, numos, dtfecha):
     sql3 = f"""
     INSERT INTO PCPREST (CODCLI, PREST, DUPLIC, VALOR, DTVENC, CODCOB, DTEMISSAO, CODFILIAL,
-	                STATUS, CODUSUR, DTVENCORIG, NUMTRANSVENDA, DTSAIDA, CODSUPERVISOR, NUMOS)
+	                STATUS, CODUSUR, DTVENCORIG, NUMTRANSVENDA, DTSAIDA, CODSUPERVISOR, NUMOS, DTFECHA)
     VALUES ({codcli}, {prest}, {duplic}, {valor}, to_date('{dtvenc}', 'DD/MM/YYYY'), '{codcob}', 
             to_date('{dtemissao}', 'DD/MM/YYYY'), {codfilial}, '{status}', {codusur}, 
             to_date('{dtvencorig}', 'DD/MM/YYYY'), {numtransvenda}, to_date('{dtsaida}', 'DD/MM/YYYY'), 
